@@ -43,7 +43,27 @@
 
     <main>
       <form action="#">
-
+				<label for="exampleFormControlInput1" class="form-label"><h3>危険の種類</h3></label>
+				<p>以下から選択してください。</p>
+				<div class="d-grid gap-2 d-md-block">
+					<button class="btn btn-warning" type="button">崩落</button>
+					<button class="btn btn-info" type="button">洪水</button>
+					<button class="btn btn-danger" type="button">火災</button>
+					<button class="btn btn-dark" type="button">その他</button>
+				</div>
+				<hr>
+				<label for="exampleFormControlInput1" class="form-label"><h3>画像</h3></label>
+				<div class="mb-3">
+					<input class="form-control" type="file" id="formFileMultiple" multiple>
+				</div>
+				<hr>
+				<label for="exampleFormControlInput1" class="form-label"><h3>コメント</h3></label>
+				<div class="form-floating">
+					<textarea class="form-control" placeholder="Leave a comment here" id="floatingTextarea"></textarea>
+					<label for="floatingTextarea">コメントを入力してください</label>
+				</div>
+				<br>
+				<button class="btn btn-primary" type="button">送信</button>
       </form>
     </main>
 
