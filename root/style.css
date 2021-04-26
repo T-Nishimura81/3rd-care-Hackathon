@@ -46,6 +46,10 @@ main{
 
 /* <user-home-home.html> */
 
+#Criteria-1{
+	position: relative;
+}
+
 #map{
 	position: absolute;
 	z-index: -1;
@@ -55,8 +59,8 @@ main{
 	left: 0;
 }
 
-.navbar navbar-expand-lg navbar-light bg-light{
-	position: relative;
+.list-group list-group-horizontal{
+	position: absolute;
 }
 
 .accordion .accordion-item .accordion-header .accordion-button{
@@ -67,4 +71,11 @@ main{
 .img-fluid{
 	max-width: 100%;
 	height: auto;
+}
+
+#add_danger{
+	position: absolute;
+	right: 5%;
+	top: 10%;
+	text-align: center;
 }

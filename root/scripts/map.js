@@ -1,89 +1,7 @@
-// Show or hide password
-$('#pw-toggle').on('click',function(){
-
-  let state = $('#password').prop('checked');
-
-  if(!state){
-    $('#password').prop('checked',true);
-    $('#password').prop('type','text');
-  }
-  else{
-    $('#password').prop('checked',false);
-    $('#password').prop('type','password');
-  }
-  
-})
-
-// Foolproof on user registration page
-document.getElementById('change').on('click',function(){
-  const fee = confirm('この内容で登録します。よろしいですか？');
-  if(fee){
-    location.href = 'login.html';
-  }
-  else {
-    location.href = '#';
-  };
-});
-
-// Change and save password after login
-$('#change').on('click',function(){
-
-  let state = $('.form-control').prop('disabled');
-
-  if(state){
-    $('.form-control').prop('disabled',false);
-    $('#pw-toggle').prop('disabled',false);
-    $('#change').attr('value','保存');
-  }
-  else{
-
-    let ans = confirm('この内容に変更します。よろしいですか？');
-
-    if(ans){
-      $('#password').prop('type','password');
-      $('.form-control').prop('disabled',true);
-      $('#pw-toggle').prop('checked',false);
-      $('#pw-toggle').prop('disabled',true);
-      $('#change').attr('value','変更');
-    }
-    else{
-      location.href = '#';
-    }
-    
-  }
-
-})
-
-// Validation
-// Example starter JavaScript for disabling form submissions if there are invalid fields
-(function () {
-  'use strict'
-
-  // Fetch all the forms we want to apply custom Bootstrap validation styles to
-  var forms = document.querySelectorAll('.needs-validation')
-
-  // Loop over them and prevent submission
-  Array.prototype.slice.call(forms)
-    .forEach(function (form) {
-      form.addEventListener('submit', function (event) {
-        if (!form.checkValidity()) {
-          event.preventDefault()
-          event.stopPropagation()
-        }
-
-        form.classList.add('was-validated')
-      }, false)
-    })
-})()
-
-// Use of open data sources
-// List of regional disaster prevention bases in Yokohama
-
-// マップ生成のための callback 関数
-function initMap() {
+async function initMap() {
 
   // マップ生成のためのテストデータ
-  let markerData = 
+  const markerData = 
   [
     {
       lat: 35.495675,
@@ -112,7 +30,6 @@ function initMap() {
         '</tr>'+
       '</table>'+
       '<a href="shelter.html" class="btn btn-primary">避難所の詳細</a>',
-      icon: ''
     },
     {
       lat: 35.4961022924626,
@@ -152,8 +69,6 @@ function initMap() {
         '</div>'+
         '<br>'+
         '<a href="danger.html" class="btn btn-primary">＋ 追加する</a>'
-      ,
-      icon: 'data/skull.png'
     },
     {
       lat: 35.4953,
@@ -178,30 +93,23 @@ function initMap() {
         '</tr>'+
       '</table>'+
       '<a href="shelter.html" class="btn btn-primary">避難所の詳細</a>',
-      icon: 'data/male-2.png'
-    }
+    },
   ];
+  
+  const directionsService = new google.maps.DirectionsService();
+  const directionsRenderer = new google.maps.DirectionsRenderer();
 
-  var directionsRenderer = new google.maps.DirectionsRenderer();
-  var directionsService = new google.maps.DirectionsService();
-
-  let latlng = new google.maps.LatLng({
-    lat: markerData[0]['lat'],
-    lng: markerData[0]['lng']
+  directionsRenderer.setOptions({
+    preserveViewport: false
   });
 
-  // 初期マップ生成のためのパラメタ
-  var opts = {
+  const map = new google.maps.Map(document.getElementById("map"), {
     zoom: 16,
-    center: latlng,
-    streetViewControl: true,
-    mapTypeControl: true
-  };
-
-  // 初期マップの生成
-  let map = new google.maps.Map(document.getElementById("map"), opts);
-
-  directionsRenderer.setMap(map);
+    center: {
+      lat: markerData[0]["lat"],
+      lng: markerData[0]["lng"]
+    },
+  });
 
   // 初期マーカーの生成
   for(var i=0; i<markerData.length; i++){
@@ -216,58 +124,52 @@ function initMap() {
 
   };
 
-  var infowindow = new google.maps.InfoWindow({
-    position: {
-      lat: markerData[1]['lat'],
-      lng: markerData[1]['lng']
-    },
-    content: markerData[1]['content']
-  });
-
-  var marker = new google.maps.Marker({
-    position: {
-      lat: markerData[1]['lat'],
-      lng: markerData[1]['lng'],
-    },
-    map: map
-  });
-
-  // マーカーをタップ時に infowindow を展開
-  google.maps.event.addListener(marker,'click',function(){
-    infowindow.open(map, marker);
-  });  
-
-  // 画面タップ時にマーカーを生成
   google.maps.event.addListener(map, 'click', event => clickListener(event, map));
 
-  // ルート案内
-  calcRoute(directionsService, directionsRenderer);
-};
+  directionsRenderer.setMap(map);
 
-// ルート案内のための関数を定義
-function calcRoute(directionsService, directionsRenderer){
+  calculateAndDisplayRoute(directionsService, directionsRenderer);
+}
+
+// ルート案内関数の定義
+function calculateAndDisplayRoute(directionsService, directionsRenderer) {
   directionsService.route(
     {
       origin: {
-        lat: markerData[0]['lat'],
-        lng: markerData[0]['lng']
+        lat: 35.495675, // jsonデータを直接指定することができなかった
+        lng: 139.67078　// jsonデータを直接指定することができなかった
       },
       destination: {
-        lat: markerData[1]['lat'],
-        lng: markerData[1]['lng']
+        lat: 35.4953,　// jsonデータを直接指定することができなかった
+        lng: 139.66695　// jsonデータを直接指定することができなかった
       },
-      travelMode: google.maps.travelMode.WALKING,  
+      travelMode: google.maps.TravelMode.WALKING,
+    },
+    (response, status) => {
+      if (status === "OK") {
+        directionsRenderer.setDirections(response);
+      } else {
+        window.alert("Directions request failed due to " + status);
+      };
     }
   );
-  (response, status) => {
-    if (status == "OK") {
-      directionsRenderer.setDirections(response);
-    } else {
-      window.alert("Directions request failed due to " + status);
-    };
-  };
 };
 
-
-// support-team/users
-// Sorting
+// マップをタップ時にマーカーと情報ウィンドウを生成する関数を定義
+async function clickListener(event, map) {
+  const lat = event.latLng.lat();
+  const lng = event.latLng.lng();
+  const marker = new google.maps.Marker({
+    position: {lat, lng},
+    map: map
+  });
+  const infowindow = new google.maps.InfoWindow({
+    position: {
+      lat: lat,
+      lng: lng
+    },
+    content:
+    '<a href="../user/danger.html" class="btn btn-primary">＋追加する</a>'
+  });
+  infowindow.open(map, marker);
+};
