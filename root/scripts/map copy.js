@@ -132,6 +132,37 @@ async function initMap() {
   
 }
 
+// マップをタップ時にマーカーと情報ウィンドウを生成する関数を定義
+async function clickListener(event, map) {
+
+  // マーカーを生成
+  const lat = event.latLng.lat();
+  console.log(lat)
+  const lng = event.latLng.lng();
+  console.log(lng)
+  const marker = new google.maps.Marker({
+    position: {lat, lng},
+  });
+  marker.setMap(map);
+
+  // 情報ウィンドウを生成
+  const infowindow = new google.maps.InfoWindow({
+    position: {
+      lat: lat,
+      lng: lng
+    },
+    content:
+    '<a href="../user/danger.html" class="btn btn-primary">危険地点を共有する</a>'+
+    '<hr>'+
+    '<button id="pre_loc" class="btn btn-primary">ここから避難所まで行く</button>'
+  });
+  infowindow.open(map, marker);
+
+  const 
+  await 
+
+};
+
 // ルート案内関数の定義
 function calculateAndDisplayRoute(directionsService, directionsRenderer) {
   directionsService.route(
@@ -154,38 +185,4 @@ function calculateAndDisplayRoute(directionsService, directionsRenderer) {
       };
     }
   );
-};
-
-// マップをタップ時にマーカーと情報ウィンドウを生成する関数を定義
-function clickListener(event, map) {
-
-  // マーカーを生成
-  const lat = event.latLng.lat();
-  console.log(lat)
-  const lng = event.latLng.lng();
-  console.log(lng)
-  const marker = new google.maps.Marker({
-    position: {lat, lng},
-  });
-  marker.setMap(map);
-  let markerX = 0;
-
-  // 情報ウィンドウを生成
-  const infowindow = new google.maps.InfoWindow({
-    position: {
-      lat: lat,
-      lng: lng
-    },
-    content:
-    '<a href="../user/danger.html" class="btn btn-primary">危険地点を共有する</a>'+
-    '<hr>'+
-    '<button id="pre_loc" class="btn btn-primary">ここから避難所まで行く</button>'
-  });
-  infowindow.open(map, marker);
-
-  // 不要なマーカーを除去
-  if(markerX == 1){
-    marker.setMap(null);
-  }
-
 };
