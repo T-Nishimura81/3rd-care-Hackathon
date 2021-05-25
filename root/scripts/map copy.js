@@ -136,52 +136,62 @@ async function initMap() {
     });
 
   };
-  google.maps.event.addListener(map, 'click', event => clickListener(event, map));
-  directionsRenderer.setMap(map);
+  google.maps.event.addListener(map, 'click', event => functionManager(event, map, directionsService, directionsRenderer));
 
+}
+
+// 関数マネージャ
+function functionManager(event, map, directionsService, directionsRenderer) {
+  let lat = event.latLng.lat();
+  console.log(lat)
+  let lng = event.latLng.lng();
+  console.log(lng)
+  let marker = new google.maps.Marker({
+    position: {lat, lng},
+  });
+  // マップをタップ時にマーカーを生成する関数
+  clickListener(event, map, lat, lng, marker)
+  // 情報ウィンドウを生成する関数
+  infowindowGenerate(lat, lng, marker)
   // ルート案内
   directionsRenderer.setMap(map);
-  calculateAndDisplayRoute(directionsService, directionsRenderer);
+  calculateAndDisplayRoute(directionsService, directionsRenderer, lat, lng)
 }
 
 // 現在地の取得
 
-// マップをタップ時にマーカーと情報ウィンドウを生成する関数を定義
-async function clickListener(event, map) {
-  // マーカーを生成
-  const lat = event.latLng.lat();
-  console.log(lat)
-  const lng = event.latLng.lng();
-  console.log(lng)
-  const marker = new google.maps.Marker({
-    position: {lat, lng},
-  });
+// マップをタップ時にマーカーを生成する関数
+function clickListener(event, map, lat, lng, marker) {
   marker.setMap(map);
+};
 
-  // 情報ウィンドウを生成
-  const infowindow = new google.maps.InfoWindow({
+// 情報ウィンドウを生成する関数
+function infowindowGenerate(lat, lng, marker) {
+
+  let infowindow = new google.maps.InfoWindow({
     position: {
       lat: lat,
       lng: lng
     },
     content:
     '<a href="../use-base-material-kit/danger.html" class="btn btn-primary">危険地点を共有する</a>'+
+    '<br>'+
     '<button id="pre_loc" class="btn btn-primary" onclick="calculateAndDisplayRoute()">ここから避難所まで行く</button>'
   });
   infowindow.open(map, marker);
-};
+}
 
-// ルート案内関数の定義
-function calculateAndDisplayRoute(directionsService, directionsRenderer) {
+// ルート案内する関数
+function calculateAndDisplayRoute(directionsService, directionsRenderer, lat, lng) {
   directionsService.route(
     {
       origin: {
-        lat: 35.495675, // jsonデータを直接指定することができなかった
-        lng: 139.67078　// jsonデータを直接指定することができなかった
+        lat: lat, // jsonデータを直接指定することができなかった
+        lng: lng　// jsonデータを直接指定することができなかった
       },
       destination: {
-        lat: 35.4953,　// jsonデータを直接指定することができなかった
-        lng: 139.66695　// jsonデータを直接指定することができなかった
+        lat: 35.495619,　// jsonデータを直接指定することができなかった
+        lng: 139.670701　// jsonデータを直接指定することができなかった
       },
       travelMode: google.maps.TravelMode.WALKING,
     },
