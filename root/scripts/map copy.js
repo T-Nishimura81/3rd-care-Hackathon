@@ -1,3 +1,17 @@
+/*
+->利用する API について
+  ->料金表：https://cloud.google.com/maps-platform/pricing/?hl=ja
+
+  ->無料枠：$200/1mth
+->maps javascript api
+  ->公式ドキュメント：
+  ->料金：$7/1000request
+->geolocation api
+  ->公式ドキュメント：https://developers.google.com/maps/documentation/geolocation/overview?hl=ja
+  ->料金：$5/1000request
+->direction api
+*/
+
 async function initMap() {
 
   // マップ生成のためのテストデータ
@@ -98,7 +112,6 @@ async function initMap() {
   
   const directionsService = new google.maps.DirectionsService();
   const directionsRenderer = new google.maps.DirectionsRenderer();
-
   directionsRenderer.setOptions({
     preserveViewport: false
   });
@@ -124,6 +137,7 @@ async function initMap() {
 
 <<<<<<< Updated upstream
   };
+<<<<<<< HEAD
 =======
   // カスタムUI追加
   addUI(map)
@@ -148,16 +162,19 @@ async function initMap() {
 
   calculateAndDisplayRoute(directionsService, directionsRenderer);
   
+=======
+  google.maps.event.addListener(map, 'click', event => functionManager(event, map, directionsService, directionsRenderer));
+
+>>>>>>> future
 }
 
-// マップをタップ時にマーカーと情報ウィンドウを生成する関数を定義
-async function clickListener(event, map) {
-
-  // マーカーを生成
-  const lat = event.latLng.lat();
+// 関数マネージャ
+function functionManager(event, map, directionsService, directionsRenderer) {
+  let lat = event.latLng.lat();
   console.log(lat)
-  const lng = event.latLng.lng();
+  let lng = event.latLng.lng();
   console.log(lng)
+<<<<<<< HEAD
 <<<<<<< Updated upstream
   const marker = new google.maps.Marker({
     position: {lat, lng},
@@ -256,37 +273,54 @@ function geolocation() {
 // マップをタップ時にマーカーを生成する関数
 function clickListener(event, map, marker) {
 >>>>>>> Stashed changes
-  marker.setMap(map);
+=======
+  let marker = new google.maps.Marker({
+    position: {lat, lng},
+  });
+  // マップをタップ時にマーカーを生成する関数
+  clickListener(event, map, lat, lng, marker)
+  // 情報ウィンドウを生成する関数
+  infowindowGenerate(lat, lng, marker)
+  // ルート案内
+  directionsRenderer.setMap(map);
+  calculateAndDisplayRoute(directionsService, directionsRenderer, lat, lng)
+}
 
-  // 情報ウィンドウを生成
-  const infowindow = new google.maps.InfoWindow({
+// 現在地の取得
+
+// マップをタップ時にマーカーを生成する関数
+function clickListener(event, map, lat, lng, marker) {
+>>>>>>> future
+  marker.setMap(map);
+};
+
+// 情報ウィンドウを生成する関数
+function infowindowGenerate(lat, lng, marker) {
+
+  let infowindow = new google.maps.InfoWindow({
     position: {
       lat: lat,
       lng: lng
     },
     content:
-    '<a href="../user/danger.html" class="btn btn-primary">危険地点を共有する</a>'+
-    '<hr>'+
-    '<button id="pre_loc" class="btn btn-primary">ここから避難所まで行く</button>'
+    '<a href="../use-base-material-kit/danger.html" class="btn btn-primary">危険地点を共有する</a>'+
+    '<br>'+
+    '<button id="pre_loc" class="btn btn-primary" onclick="calculateAndDisplayRoute()">ここから避難所まで行く</button>'
   });
   infowindow.open(map, marker);
+}
 
-  const 
-  await 
-
-};
-
-// ルート案内関数の定義
-function calculateAndDisplayRoute(directionsService, directionsRenderer) {
+// ルート案内する関数
+function calculateAndDisplayRoute(directionsService, directionsRenderer, lat, lng) {
   directionsService.route(
     {
       origin: {
-        lat: 35.495675, // jsonデータを直接指定することができなかった
-        lng: 139.67078　// jsonデータを直接指定することができなかった
+        lat: lat, // jsonデータを直接指定することができなかった
+        lng: lng　// jsonデータを直接指定することができなかった
       },
       destination: {
-        lat: 35.4953,　// jsonデータを直接指定することができなかった
-        lng: 139.66695　// jsonデータを直接指定することができなかった
+        lat: 35.495619,　// jsonデータを直接指定することができなかった
+        lng: 139.670701　// jsonデータを直接指定することができなかった
       },
       travelMode: google.maps.TravelMode.WALKING,
     },

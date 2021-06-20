@@ -1,3 +1,17 @@
+/*
+->利用する API について
+  ->料金表：https://cloud.google.com/maps-platform/pricing/?hl=ja#:~:text=%E3%83%9E%E3%83%83%E3%83%97%E3%80%81%E3%83%AB%E3%83%BC%E3%83%88%E3%80%81%E3%83%97%E3%83%AC%E3%82%A4%E3%82%B9%E3%81%AE%E6%96%99%E9%87%91&text=%E6%AF%8E%E6%9C%88%20%24200%20%E5%88%86%E3%81%BE%E3%81%A7%E3%81%AF%E7%84%A1%E6%96%99%E3%81%A7%E3%81%94%E5%88%A9%E7%94%A8%E3%81%84%E3%81%9F%E3%81%A0%E3%81%91%E3%81%BE%E3%81%99%E3%80%82&text=%E4%BD%BF%E7%94%A8%E9%87%8F%E3%81%8C%2010%20%E4%B8%87,%E3%81%94%E7%94%A8%E6%84%8F%E3%81%97%E3%81%A6%E3%81%84%E3%81%BE%E3%81%99%E3%80%82
+
+  ->無料枠：$200/1mth
+->maps javascript api
+  ->公式ドキュメント：
+  ->料金：$7/1000request
+->geolocation api
+  ->公式ドキュメント：https://developers.google.com/maps/documentation/geolocation/overview?hl=ja
+  ->料金：$5/1000request
+->direction api
+*/
+
 async function initMap() {
 
   // マップ生成のためのテストデータ
@@ -98,7 +112,6 @@ async function initMap() {
   
   const directionsService = new google.maps.DirectionsService();
   const directionsRenderer = new google.maps.DirectionsRenderer();
-
   directionsRenderer.setOptions({
     preserveViewport: false
   });
@@ -123,14 +136,40 @@ async function initMap() {
     });
 
   };
-
   google.maps.event.addListener(map, 'click', event => clickListener(event, map));
-
   directionsRenderer.setMap(map);
 
+  // ルート案内
+  directionsRenderer.setMap(map);
   calculateAndDisplayRoute(directionsService, directionsRenderer);
-  
 }
+
+// 現在地の取得
+
+// マップをタップ時にマーカーと情報ウィンドウを生成する関数を定義
+async function clickListener(event, map) {
+  // マーカーを生成
+  const lat = event.latLng.lat();
+  console.log(lat)
+  const lng = event.latLng.lng();
+  console.log(lng)
+  const marker = new google.maps.Marker({
+    position: {lat, lng},
+  });
+  marker.setMap(map);
+
+  // 情報ウィンドウを生成
+  const infowindow = new google.maps.InfoWindow({
+    position: {
+      lat: lat,
+      lng: lng
+    },
+    content:
+    '<a href="../use-base-material-kit/danger.html" class="btn btn-primary">危険地点を共有する</a>'+
+    '<button id="pre_loc" class="btn btn-primary" onclick="calculateAndDisplayRoute()">ここから避難所まで行く</button>'
+  });
+  infowindow.open(map, marker);
+};
 
 // ルート案内関数の定義
 function calculateAndDisplayRoute(directionsService, directionsRenderer) {
@@ -154,38 +193,4 @@ function calculateAndDisplayRoute(directionsService, directionsRenderer) {
       };
     }
   );
-};
-
-// マップをタップ時にマーカーと情報ウィンドウを生成する関数を定義
-function clickListener(event, map) {
-
-  // マーカーを生成
-  const lat = event.latLng.lat();
-  console.log(lat)
-  const lng = event.latLng.lng();
-  console.log(lng)
-  const marker = new google.maps.Marker({
-    position: {lat, lng},
-  });
-  marker.setMap(map);
-  let markerX = 0;
-
-  // 情報ウィンドウを生成
-  const infowindow = new google.maps.InfoWindow({
-    position: {
-      lat: lat,
-      lng: lng
-    },
-    content:
-    '<a href="../user/danger.html" class="btn btn-primary">危険地点を共有する</a>'+
-    '<hr>'+
-    '<button id="pre_loc" class="btn btn-primary">ここから避難所まで行く</button>'
-  });
-  infowindow.open(map, marker);
-
-  // 不要なマーカーを除去
-  if(markerX == 1){
-    marker.setMap(null);
-  }
-
 };
