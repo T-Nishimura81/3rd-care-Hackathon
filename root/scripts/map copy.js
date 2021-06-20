@@ -125,17 +125,18 @@ async function initMap() {
   });
 
   // 初期マーカーの生成
-  for(var i=0; i<markerData.length; i++){
+  // for(var i=0; i<markerData.length; i++){
 
-    let marker = new google.maps.Marker({
-      position: {
-        lat: markerData[i]['lat'],
-        lng: markerData[i]['lng']  
-      },
-      map: map
-    });
+  //   let marker = new google.maps.Marker({
+  //     position: {
+  //       lat: markerData[i]['lat'],
+  //       lng: markerData[i]['lng']  
+  //     },
+  //     map: map
+  //   });
 
-  };
+  // };
+
   google.maps.event.addListener(map, 'click', event => functionManager(event, map, directionsService, directionsRenderer));
 
 }
@@ -149,10 +150,7 @@ function functionManager(event, map, directionsService, directionsRenderer) {
   let marker = new google.maps.Marker({
     position: {lat, lng},
   });
-  // マップをタップ時にマーカーを生成する関数
-  clickListener(event, map, lat, lng, marker)
-  // 情報ウィンドウを生成する関数
-  infowindowGenerate(lat, lng, marker)
+  
   // ルート案内
   directionsRenderer.setMap(map);
   calculateAndDisplayRoute(directionsService, directionsRenderer, lat, lng)
