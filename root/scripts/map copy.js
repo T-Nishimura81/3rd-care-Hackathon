@@ -122,11 +122,29 @@ async function initMap() {
       map: map
     });
 
+<<<<<<< Updated upstream
   };
+=======
+  // カスタムUI追加
+  addUI(map)
+
+  // 
+  google.maps.event.addListener(map, 'click', event => functionManager(event, map, directionsService, directionsRenderer));
+>>>>>>> Stashed changes
 
   google.maps.event.addListener(map, 'click', event => clickListener(event, map));
 
+<<<<<<< Updated upstream
   directionsRenderer.setMap(map);
+=======
+  const centerControlDiv = document.createElement("div");
+  CenterControl(centerControlDiv, map);
+  map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
+
+  // 現在地から避難所までルート案内
+  // let dirRoute = document.getElementById('pre_loc');
+  // google.maps.event.addListener(dirRoute, 'click', event => );
+>>>>>>> Stashed changes
 
   calculateAndDisplayRoute(directionsService, directionsRenderer);
   
@@ -140,9 +158,104 @@ async function clickListener(event, map) {
   console.log(lat)
   const lng = event.latLng.lng();
   console.log(lng)
+<<<<<<< Updated upstream
   const marker = new google.maps.Marker({
     position: {lat, lng},
   });
+=======
+  let marker = new google.maps.Marker({
+    position: {lat, lng}
+  });
+  
+  // // マップをタップ時にマーカーを生成する関数
+  // clickListener(event, map, marker)
+
+  // // 情報ウィンドウを生成する関数
+  // infowindowGenerate(lat, lng, marker)
+
+  // スマホフレンドリーな情報ウィンドウ
+  // mobileInfoWindow(map)
+
+  // ルート案内
+  directionsRenderer.setMap(map);
+  directionsRenderer.setPanel(document.getElementById('directionPanel'));
+  calculateAndDisplayRoute(directionsService, directionsRenderer, lat, lng)
+}
+
+// カスタムコントロールUIの追加
+function addUI(map) {
+  const UIcntrl = document.createElement('div');
+  const UI = document.createElement('img');
+
+  UI.src = '../data/img/ポイントカーソル.jpeg';
+  UI.style.cursor = "pointer";
+  UI.width = 40;
+  UI.height = 40;
+
+  UIcntrl.appendChild(UI);
+  map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(UIcntrl);
+
+  UI.style.paddingRight = '10%';
+}
+
+function CenterControl(controlDiv, map) {
+  // Set CSS for the control border.
+  const controlUI = document.createElement("div");
+  controlUI.style.backgroundColor = "#fff";
+  controlUI.style.border = "2px solid #fff";
+  controlUI.style.borderRadius = "3px";
+  controlUI.style.boxShadow = "0 2px 6px rgba(0,0,0,.3)";
+  controlUI.style.cursor = "pointer";
+  controlUI.style.marginTop = "8px";
+  controlUI.style.marginBottom = "22px";
+  controlUI.style.textAlign = "center";
+  controlUI.title = "Click to recenter the map";
+  controlDiv.appendChild(controlUI);
+  // Set CSS for the control interior.
+  const controlText = document.createElement("div");
+  controlText.style.color = "rgb(25,25,25)";
+  controlText.style.fontFamily = "Roboto,Arial,sans-serif";
+  controlText.style.fontSize = "16px";
+  controlText.style.lineHeight = "38px";
+  controlText.style.paddingLeft = "5px";
+  controlText.style.paddingRight = "5px";
+  controlText.innerHTML = "Center Map";
+  controlUI.appendChild(controlText);
+  // Setup the click event listeners: simply set the map to Chicago.
+  controlUI.addEventListener("click", () => {
+    map.setCenter(chicago);
+  });
+}
+
+// 現在地の取得
+function geolocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(success, error, option);
+    function success(position) {
+      let data = position.coords;
+      let lat = data.latitude;
+      let lng = data.longitude;
+
+      let geocoder = new google.maps.Geocoder();
+      let latlng = new google.maps.Latlng(lat, lng);
+      geocoder.geocode({
+        'latLng': latlng
+      },function(results, status) {
+        if (status == google.maps.GeocoderStatus.OK) {
+          console.log(results[0].formatted_address);
+        } else {
+          alert("エラー：" + status);
+        }
+      })
+    }
+  } else {
+
+  }
+}
+
+// マップをタップ時にマーカーを生成する関数
+function clickListener(event, map, marker) {
+>>>>>>> Stashed changes
   marker.setMap(map);
 
   // 情報ウィンドウを生成
