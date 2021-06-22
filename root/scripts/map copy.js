@@ -116,11 +116,12 @@ async function initMap() {
     preserveViewport: false
   });
 
+  // マップの生成
   const map = new google.maps.Map(document.getElementById("map"), {
     zoom: 16,
     center: {
-      lat: markerData[0]["lat"],
-      lng: markerData[0]["lng"]
+      lat: 35.495675,
+      lng: 139.67078
     },
   });
 
@@ -137,7 +138,7 @@ async function initMap() {
 
   // };
 
-  google.maps.event.addListener(map, 'click', event => functionManager(event, map, directionsService, directionsRenderer));
+  addUI(map)
 
 }
 
@@ -156,10 +157,53 @@ function functionManager(event, map, directionsService, directionsRenderer) {
   calculateAndDisplayRoute(directionsService, directionsRenderer, lat, lng)
 }
 
-// 現在地の取得
+// カスタムUIの追加
+function addUI(map) {
+  const UIbg = document.createElement('div');
+  const UI = document.createElement('img');
 
-// マップをタップ時にマーカーを生成する関数
-function clickListener(event, map, lat, lng, marker) {
+  UIbg.style.paddingRight = "2.5%";
+
+  UI.src = "../data/img/ポイントカーソル.jpeg";
+  UI.width = 40;
+  UI.height = 40;
+  UI.style.cursor = "pointer";
+  UIbg.appendChild(UI);
+
+  map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(UIbg);
+
+  UIbg.addEventListener("click", () => {
+    geolocation(map)
+  });
+}
+
+// 現在地の取得
+function geolocation(map) {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        markerGenerate(map, lat, lng)
+      }
+    );
+  }
+}
+
+// マーカーを生成する関数
+function markerGenerate(map, lat, lng) {
+  let marker = new google.maps.Marker({
+    position: {
+      lat: lat,
+      lng: lng
+    },
+    map: map,
+    icon: new google.maps.MarkerImage(
+      "../data/img/位置情報アイコン4.png",
+      new google.maps.Size(48, 48),
+      new google.maps.Point(0, 0)
+    )
+  })
   marker.setMap(map);
 };
 
