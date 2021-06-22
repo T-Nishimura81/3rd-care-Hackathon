@@ -116,7 +116,7 @@ async function initMap() {
     preserveViewport: false
   });
 
-  // マップの生成
+  // 初期マップの生成
   const map = new google.maps.Map(document.getElementById("map"), {
     zoom: 16,
     center: {
@@ -125,19 +125,7 @@ async function initMap() {
     },
   });
 
-  // 初期マーカーの生成
-  // for(var i=0; i<markerData.length; i++){
-
-  //   let marker = new google.maps.Marker({
-  //     position: {
-  //       lat: markerData[i]['lat'],
-  //       lng: markerData[i]['lng']  
-  //     },
-  //     map: map
-  //   });
-
-  // };
-
+  // 現在地にマーカーを立てるUIの追加
   addUI(map)
 
 }
@@ -182,8 +170,8 @@ function geolocation(map) {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const lat = position.coords.latitude;
-        const lng = position.coords.longitude;
+        let lat = position.coords.latitude;
+        let lng = position.coords.longitude;
         markerGenerate(map, lat, lng)
       }
     );
@@ -192,6 +180,14 @@ function geolocation(map) {
 
 // マーカーを生成する関数
 function markerGenerate(map, lat, lng) {
+  map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 16,
+    center: {
+      lat: lat,
+      lng: lng
+    }
+  })
+
   let marker = new google.maps.Marker({
     position: {
       lat: lat,
@@ -205,6 +201,8 @@ function markerGenerate(map, lat, lng) {
     )
   })
   marker.setMap(map);
+
+  addUI(map)
 };
 
 // 情報ウィンドウを生成する関数
