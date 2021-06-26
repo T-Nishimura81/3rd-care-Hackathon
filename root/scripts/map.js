@@ -1,6 +1,6 @@
 /*
 ->利用する API について
-  ->料金表：https://cloud.google.com/maps-platform/pricing/?hl=ja#:~:text=%E3%83%9E%E3%83%83%E3%83%97%E3%80%81%E3%83%AB%E3%83%BC%E3%83%88%E3%80%81%E3%83%97%E3%83%AC%E3%82%A4%E3%82%B9%E3%81%AE%E6%96%99%E9%87%91&text=%E6%AF%8E%E6%9C%88%20%24200%20%E5%88%86%E3%81%BE%E3%81%A7%E3%81%AF%E7%84%A1%E6%96%99%E3%81%A7%E3%81%94%E5%88%A9%E7%94%A8%E3%81%84%E3%81%9F%E3%81%A0%E3%81%91%E3%81%BE%E3%81%99%E3%80%82&text=%E4%BD%BF%E7%94%A8%E9%87%8F%E3%81%8C%2010%20%E4%B8%87,%E3%81%94%E7%94%A8%E6%84%8F%E3%81%97%E3%81%A6%E3%81%84%E3%81%BE%E3%81%99%E3%80%82
+  ->料金表：https://cloud.google.com/maps-platform/pricing/?hl=ja
 
   ->無料枠：$200/1mth
 ->maps javascript api
@@ -116,72 +116,129 @@ async function initMap() {
     preserveViewport: false
   });
 
+  // 初期マップの生成
   const map = new google.maps.Map(document.getElementById("map"), {
     zoom: 16,
     center: {
-      lat: markerData[0]["lat"],
-      lng: markerData[0]["lng"]
+      lat: 35.495675,
+      lng: 139.67078
     },
   });
 
-  // 初期マーカーの生成
-  for(var i=0; i<markerData.length; i++){
+  // 現在地にマーカーを立てるUIの追加
+  addUI(map)
 
-    let marker = new google.maps.Marker({
-      position: {
-        lat: markerData[i]['lat'],
-        lng: markerData[i]['lng']  
-      },
-      map: map
-    });
+  // 現在地からルート案内を行う
 
-  };
-  google.maps.event.addListener(map, 'click', event => clickListener(event, map));
-  directionsRenderer.setMap(map);
+}
 
+// 関数マネージャ
+function functionManager(event, map, directionsService, directionsRenderer) {
+  let lat = event.latLng.lat();
+  console.log(lat)
+  let lng = event.latLng.lng();
+  console.log(lng)
+  let marker = new google.maps.Marker({
+    position: {lat, lng},
+  });
+  
   // ルート案内
   directionsRenderer.setMap(map);
-  calculateAndDisplayRoute(directionsService, directionsRenderer);
+  calculateAndDisplayRoute(directionsService, directionsRenderer, lat, lng)
+}
+
+// カスタムUIの追加
+function addUI(map) {
+  const UIbg = document.createElement('div');
+  const UI = document.createElement('img');
+
+  UIbg.style.paddingRight = "2.5%";
+
+  UI.src = "../data/img/ポイントカーソル.jpeg";
+  UI.width = 40;
+  UI.height = 40;
+  UI.style.cursor = "pointer";
+  UIbg.appendChild(UI);
+
+  map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(UIbg);
+
+  UIbg.addEventListener("click", () => {
+    geolocation(map)
+  });
 }
 
 // 現在地の取得
+function geolocation(map) {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        let lat = position.coords.latitude;
+        let lng = position.coords.longitude;
+        markerGenerate(map, lat, lng)
+      }
+    );
+  }
+}
 
-// マップをタップ時にマーカーと情報ウィンドウを生成する関数を定義
-async function clickListener(event, map) {
-  // マーカーを生成
-  const lat = event.latLng.lat();
-  console.log(lat)
-  const lng = event.latLng.lng();
-  console.log(lng)
-  const marker = new google.maps.Marker({
-    position: {lat, lng},
-  });
+// マーカーを生成する関数
+function markerGenerate(map, lat, lng) {
+
+  map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 16,
+    center: {
+      lat: lat,
+      lng: lng
+    }
+  })
+
+  let marker = new google.maps.Marker({
+    position: {
+      lat: lat,
+      lng: lng
+    },
+    map: map,
+    icon: new google.maps.MarkerImage(
+      "../data/img/位置情報アイコン4.png",
+      new google.maps.Size(48, 48),
+      new google.maps.Point(0, 0)
+    )
+  })
   marker.setMap(map);
 
-  // 情報ウィンドウを生成
-  const infowindow = new google.maps.InfoWindow({
+  addUI(map)
+  infowindowGenerate(marker, lat, lng)
+  
+};
+
+// 情報ウィンドウを生成する関数
+function infowindowGenerate(marker, lat, lng) {
+
+  let infowindow = new google.maps.InfoWindow({
     position: {
       lat: lat,
       lng: lng
     },
     content:
     '<a href="../use-base-material-kit/danger.html" class="btn btn-primary">危険地点を共有する</a>'+
-    '<button id="pre_loc" class="btn btn-primary" onclick="calculateAndDisplayRoute()">ここから避難所まで行く</button>'
+    '<br>'+
+    '<button id="pre_loc" class="btn btn-primary">ここから避難所まで行く</button>'
   });
   infowindow.open(map, marker);
-};
 
-// ルート案内関数の定義
-function calculateAndDisplayRoute(directionsService, directionsRenderer) {
+  Directions(directionsService, directionsRenderer, lat, lng)
+}
+
+// ルート案内する関数
+function calculateAndDisplayRoute(directionsService, directionsRenderer, lat, lng) {
   directionsService.route(
     {
       origin: {
-        lat: 35.495675, // jsonデータを直接指定することができなかった
-        lng: 139.67078　// jsonデータを直接指定することができなかった
+        lat: lat, // jsonデータを直接指定することができなかった
+        lng: lng　// jsonデータを直接指定することができなかった
       },
       destination: {
-        lat: 35.4953,　// jsonデータを直接指定することができなかった
-        lng: 139.66695　// jsonデータを直接指定することができなかった
+        lat: 35.495619,　// jsonデータを直接指定することができなかった
+        lng: 139.670701　// jsonデータを直接指定することができなかった
       },
       travelMode: google.maps.TravelMode.WALKING,
     },
