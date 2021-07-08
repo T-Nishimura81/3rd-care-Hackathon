@@ -29,9 +29,19 @@ async function initMap() {
     },
   });
 
+  const target = document.getElementById("map");
+  const observer = new MutationObserver(function (mutations, observer){
+    
+  });
+  const config = {
+    childList: true,
+    subtree: true
+  };
+
+  observer.observe(target, config);
+
   // 現在地にマーカーを立てるUIの追加
   addUI(map, directionsService, directionsRenderer)
-
 
   // 現在地からルート案内を行う
 
@@ -121,16 +131,6 @@ function infowindowGenerate(marker, lat, lng, directionsService, directionsRende
   });
   infowindow.open(map, marker);
 
-  const target = document.getElementById("map");
-  const observer = new MutationObserver(function (){
-    
-  });
-  const config = {
-    childList: true,
-    subtree: true
-  };
-
-  observer.observe(target, config);
 }
 
 // ルート案内する関数
