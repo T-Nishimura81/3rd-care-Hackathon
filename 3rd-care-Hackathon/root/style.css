@@ -1,0 +1,41 @@
+/*メイン背景色*/
+main{
+	margin: 5%;
+	padding: 5%;
+	background-color: white;
+}
+
+#Criteria-1{
+	position: relative;
+}
+
+/* マップスタイル */
+#map{
+	position: absolute;
+	z-index: -1;
+	top: 1px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+}
+
+.list-group list-group-horizontal{
+	position: absolute;
+}
+
+.accordion .accordion-item .accordion-header .accordion-button{
+	position: relative;
+}
+
+/* infowindow */
+.img-fluid{
+	max-width: 100%;
+	height: auto;
+}
+
+#add_danger{
+	position: absolute;
+	right: 5%;
+	top: 10%;
+	text-align: center;
+}
