@@ -54,7 +54,7 @@ function addUI(map, directionsService, directionsRenderer) {
 
   UIbg.style.paddingRight = "2.5%";
 
-  UI.src = "../data/img/ポイントカーソル.jpeg";
+  UI.src = "../data/ポイントカーソル.jpeg";
   UI.width = 40;
   UI.height = 40;
   UI.style.cursor = "pointer";
@@ -98,7 +98,7 @@ function markerGenerate(map, lat, lng, directionsService, directionsRenderer) {
     },
     map: map,
     icon: new google.maps.MarkerImage(
-      "../data/img/位置情報アイコン4.png",
+      "../data/位置情報アイコン4.png",
       new google.maps.Size(48, 48),
       new google.maps.Point(0, 0)
     )
