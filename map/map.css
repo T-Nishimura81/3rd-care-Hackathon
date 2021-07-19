@@ -1,12 +1,8 @@
-/*メイン背景色*/
+/*メイン設定*/
 main{
 	margin: 5%;
 	padding: 5%;
 	background-color: white;
-}
-
-#Criteria-1{
-	position: relative;
 }
 
 /* マップスタイル */
@@ -31,11 +27,4 @@ main{
 .img-fluid{
 	max-width: 100%;
 	height: auto;
-}
-
-#add_danger{
-	position: absolute;
-	right: 5%;
-	top: 10%;
-	text-align: center;
 }
