@@ -124,7 +124,7 @@ function infowindowGenerate(marker, lat, lng, directionsService, directionsRende
     },
     content:
     '<div id="pre_loc_div">'+
-      '<a href="../use-base-material-kit/danger.html" class="btn btn-primary">危険地点を共有する</a>'+
+      '<a href="../danger/danger.html" class="btn btn-primary">危険地点を共有する</a>'+
       '<br>'+
       '<button id="pre_loc" class="btn btn-primary">ここから避難所まで行く</button>'+
     '</div>'
