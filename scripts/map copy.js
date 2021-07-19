@@ -12,7 +12,7 @@
 ->direction api
 */
 
-function initMap() {
+async function initMap() {
   
   const directionsService = new google.maps.DirectionsService();
   const directionsRenderer = new google.maps.DirectionsRenderer();
@@ -52,7 +52,7 @@ function addUI(map, directionsService, directionsRenderer) {
   const UIbg = document.createElement('div');
   const UI = document.createElement('img');
 
-  UIbg.style.paddingRight = "1%";
+  UIbg.style.paddingRight = "2.5%";
 
   UI.src = "../data/ポイントカーソル.jpeg";
   UI.width = 40;
