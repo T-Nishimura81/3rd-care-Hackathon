@@ -1,0 +1,30 @@
+/*メイン設定*/
+main{
+	margin: 5%;
+	padding: 5%;
+	background-color: white;
+}
+
+/* マップスタイル */
+#map{
+	position: absolute;
+	z-index: -1;
+	top: 1px;
+	right: 0;
+	bottom: 0;
+	left: 0;
+}
+
+.list-group list-group-horizontal{
+	position: absolute;
+}
+
+.accordion .accordion-item .accordion-header .accordion-button{
+	position: relative;
+}
+
+/* infowindow */
+.img-fluid{
+	max-width: 100%;
+	height: auto;
+}
