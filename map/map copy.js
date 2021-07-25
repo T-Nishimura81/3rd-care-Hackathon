@@ -12,7 +12,7 @@
 ->direction api
 */
 
-async function initMap() {
+function initMap() {
   
   const directionsService = new google.maps.DirectionsService();
   const directionsRenderer = new google.maps.DirectionsRenderer();
@@ -29,26 +29,29 @@ async function initMap() {
     },
   });
 
-  const target = document.getElementById("map");
-  const observer = new MutationObserver(function (mutations, observer){
-    
-  });
-  const config = {
-    childList: true,
+  // マップの生成を検知
+  const MutationTarget = document.querySelector(".gm-style-iw-t");
+
+  const MutationConf = {
     subtree: true
   };
 
-  observer.observe(target, config);
+  const observer = new MutationObserver(function (){
+    // 現在地のinfowindowの子孫ノードを検知
+    observer.observe()
+  });
+
+  // observer.observe(target, conf);
 
   // 現在地にマーカーを立てるUIの追加
-  addUI(map, directionsService, directionsRenderer)
+  addMapUI(map, directionsService, directionsRenderer)
 
   // 現在地からルート案内を行う
 
 }
 
 // カスタムUIの追加
-function addUI(map, directionsService, directionsRenderer) {
+function addMapUI(map, directionsService, directionsRenderer) {
   const UIbg = document.createElement('div');
   const UI = document.createElement('img');
 
@@ -109,7 +112,7 @@ function markerGenerate(map, lat, lng, directionsService, directionsRenderer) {
   map.setCenter(new google.maps.LatLng(lat, lng));
 
   // googleMapのcenterを変更するとUIが消えるので再追加する
-  addUI(map)
+  addMapUI(map)
 
   infowindowGenerate(marker, lat, lng, directionsService, directionsRenderer)
 };
@@ -130,7 +133,6 @@ function infowindowGenerate(marker, lat, lng, directionsService, directionsRende
     '</div>'
   });
   infowindow.open(map, marker);
-
 }
 
 // ルート案内する関数
