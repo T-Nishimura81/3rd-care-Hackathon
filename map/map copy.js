@@ -29,25 +29,10 @@ function initMap() {
     },
   });
 
-  // マップの生成を検知
-  const MutationTarget = document.querySelector(".gm-style-iw-t");
-
-  const MutationConf = {
-    subtree: true
-  };
-
-  const observer = new MutationObserver(function (){
-    // 現在地のinfowindowの子孫ノードを検知
-    observer.observe()
-  });
-
-  // observer.observe(target, conf);
-
   // 現在地にマーカーを立てるUIの追加
   addMapUI(map, directionsService, directionsRenderer)
 
   // 現在地からルート案内を行う
-
 }
 
 // カスタムUIの追加
@@ -67,7 +52,7 @@ function addMapUI(map, directionsService, directionsRenderer) {
 
   UIbg.addEventListener("click", () => {
     geolocation(map, directionsService, directionsRenderer)
-  }, false);
+  });
 }
 
 // 現在地の取得
@@ -77,7 +62,8 @@ function geolocation(map, directionsService, directionsRenderer) {
       (position) => {
         let lat = position.coords.latitude;
         let lng = position.coords.longitude;
-        markerGenerate(map, lat, lng, directionsService, directionsRenderer)
+        markerGenerate(map, lat, lng, directionsService, directionsRenderer);
+        return lat, lng;
       }
     );
   }
@@ -114,25 +100,52 @@ function markerGenerate(map, lat, lng, directionsService, directionsRenderer) {
   // googleMapのcenterを変更するとUIが消えるので再追加する
   addMapUI(map)
 
+  MObsever(map, directionsService, directionsRenderer, lat, lng)
+
   infowindowGenerate(marker, lat, lng, directionsService, directionsRenderer)
 };
 
 // 情報ウィンドウを生成する関数
 function infowindowGenerate(marker, lat, lng, directionsService, directionsRenderer) {
-
+  let ifContent =
+  '<div id="pre_loc_div">'+
+    '<button id="pre_loc" class="btn btn-primary">現在地から避難所まで行く</button>'+
+  '</div>'
   let infowindow = new google.maps.InfoWindow({
     position: {
       lat: lat,
       lng: lng
     },
-    content:
-    '<div id="pre_loc_div">'+
-      '<a href="../danger/danger.html" class="btn btn-primary">危険地点を共有する</a>'+
-      '<br>'+
-      '<button id="pre_loc" class="btn btn-primary">ここから避難所まで行く</button>'+
-    '</div>'
+    content: ifContent
   });
+
   infowindow.open(map, marker);
+}
+
+// MutationObserver
+// マップの生成を検知
+function MObsever(map, directionsService, directionsRenderer, lat, lng) {
+  let MTarget = document.querySelector("#map");
+
+  const MConf = {
+    childList: true,
+    subtree: true
+  };
+
+  const observer = new MutationObserver(function (){
+    let sample123 = document.querySelector("#pre_loc");
+
+    if (sample123) {
+      observer.disconnect();
+    }
+
+    sample123.addEventListener("click", () => {
+      directionsRenderer.setMap(map);
+      calculateAndDisplayRoute(directionsService, directionsRenderer, lat, lng)
+    }, false);
+  });
+  
+  observer.observe(MTarget, MConf);
 }
 
 // ルート案内する関数
