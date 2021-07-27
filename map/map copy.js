@@ -42,7 +42,8 @@ function addMapUI(map, directionsService, directionsRenderer) {
 
   UIbg.style.paddingRight = "2.5%";
 
-  UI.src = "../data/ポイントカーソル.jpeg";
+  UI.src = "../data/outline_my_location_black_48dp.png";
+  UI.style.backgroundColor = "white";
   UI.width = 40;
   UI.height = 40;
   UI.style.cursor = "pointer";
@@ -60,10 +61,11 @@ function geolocation(map, directionsService, directionsRenderer) {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        let lat = position.coords.latitude;
-        let lng = position.coords.longitude;
+        // let lat = position.coords.latitude;
+        // let lng = position.coords.longitude;
+        let lat = 35.450361;
+        let lng = 139.634228;
         markerGenerate(map, lat, lng, directionsService, directionsRenderer);
-        return lat, lng;
       }
     );
   }
@@ -87,7 +89,7 @@ function markerGenerate(map, lat, lng, directionsService, directionsRenderer) {
     },
     map: map,
     icon: new google.maps.MarkerImage(
-      "../data/位置情報アイコン4.png",
+      "../data/outline_person_pin_circle_black_48dp.png",
       new google.maps.Size(48, 48),
       new google.maps.Point(0, 0)
     )
@@ -100,13 +102,11 @@ function markerGenerate(map, lat, lng, directionsService, directionsRenderer) {
   // googleMapのcenterを変更するとUIが消えるので再追加する
   addMapUI(map)
 
-  MObsever(map, directionsService, directionsRenderer, lat, lng)
-
-  infowindowGenerate(marker, lat, lng, directionsService, directionsRenderer)
+  infowindowGenerate(map, marker, lat, lng, directionsService, directionsRenderer)
 };
 
 // 情報ウィンドウを生成する関数
-function infowindowGenerate(marker, lat, lng, directionsService, directionsRenderer) {
+function infowindowGenerate(map, marker, lat, lng, directionsService, directionsRenderer) {
   let ifContent =
   '<div id="pre_loc_div">'+
     '<button id="pre_loc" class="btn btn-primary">現在地から避難所まで行く</button>'+
@@ -120,11 +120,14 @@ function infowindowGenerate(marker, lat, lng, directionsService, directionsRende
   });
 
   infowindow.open(map, marker);
+
+  MObsever(map, marker, infowindow, directionsService, directionsRenderer, lat, lng)
 }
 
 // MutationObserver
 // マップの生成を検知
-function MObsever(map, directionsService, directionsRenderer, lat, lng) {
+function MObsever(map, marker, infowindow, directionsService, directionsRenderer, lat, lng) {
+
   let MTarget = document.querySelector("#map");
 
   const MConf = {
@@ -133,23 +136,25 @@ function MObsever(map, directionsService, directionsRenderer, lat, lng) {
   };
 
   const observer = new MutationObserver(function (){
-    let sample123 = document.querySelector("#pre_loc");
+    MTarget = document.querySelector("#pre_loc");
 
-    if (sample123) {
+    if (MTarget) {
       observer.disconnect();
+      MTarget.addEventListener("click", () => {
+        directionsRenderer.setMap(map);
+        directionsRenderer.setPanel(document.querySelector("#route"));
+        calculateAndDisplayRoute(directionsService, directionsRenderer, lat, lng, marker, infowindow)
+      }, false);
     }
-
-    sample123.addEventListener("click", () => {
-      directionsRenderer.setMap(map);
-      calculateAndDisplayRoute(directionsService, directionsRenderer, lat, lng)
-    }, false);
   });
   
   observer.observe(MTarget, MConf);
 }
 
 // ルート案内する関数
-function calculateAndDisplayRoute(directionsService, directionsRenderer, lat, lng) {
+function calculateAndDisplayRoute(directionsService, directionsRenderer, lat, lng, marker, infowindow) {
+  infowindow.close();
+  marker.setMap(null);
   directionsService.route(
     {
       origin: {
