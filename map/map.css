@@ -15,6 +15,10 @@ main{
 	left: 0;
 }
 
+#route{
+	position: absolute;
+}
+
 .list-group list-group-horizontal{
 	position: absolute;
 }
