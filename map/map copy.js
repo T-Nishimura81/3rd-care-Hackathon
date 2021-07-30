@@ -32,17 +32,21 @@ function initMap() {
   // 現在地にマーカーを立てるUIの追加
   addMapUI(map, directionsService, directionsRenderer)
 
-  // 現在地からルート案内を行う
+  // let initial_location = [];
+  // let pin_img_path = '';
+  // let pin_names = [];
+  // let pin_locations = []; 
+  // setUpKaigoHackMap(initial_location, info_html, pin_img_path, pin_names, pin_locations)
 }
 
 // カスタムUIの追加
-function addMapUI(map, directionsService, directionsRenderer) {
+async function addMapUI(map, directionsService, directionsRenderer) {
   const UIbg = document.createElement('div');
   const UI = document.createElement('img');
 
   UIbg.style.paddingRight = "2.5%";
 
-  UI.src = "../data/outline_my_location_black_48dp.png";
+  UI.src = "../data/location.png";
   UI.style.backgroundColor = "white";
   UI.width = 40;
   UI.height = 40;
@@ -52,44 +56,43 @@ function addMapUI(map, directionsService, directionsRenderer) {
   map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(UIbg);
 
   UIbg.addEventListener("click", () => {
-    geolocation(map, directionsService, directionsRenderer)
+    let initial_location = await geolocation()
+    // markerGenerate(map, initial_location)
   });
 }
 
 // 現在地の取得
-function geolocation(map, directionsService, directionsRenderer) {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        // let lat = position.coords.latitude;
-        // let lng = position.coords.longitude;
-        let lat = 35.450361;
-        let lng = 139.634228;
-        markerGenerate(map, lat, lng, directionsService, directionsRenderer);
-      }
-    );
-  }
+// 「変数名 = await geolocation()」をasync func 内で実行すると「initial_location[lat, lng]」が返ってくる 
+async function geolocation(){
+  let latlng = new Promise((resolve) => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        position => {
+          let lat = position.coords.latitude;
+          let lng = position.coords.longitude;
+          return resolve([lat, lng]);
+        }
+      );
+    }  
+  });
+
+  let initial_location = await latlng;
+  return initial_location;
 }
 
 // マーカーを生成する関数
-function markerGenerate(map, lat, lng, directionsService, directionsRenderer) {
+function markerGenerate(map, initial_location) {
 
   map = new google.maps.Map(document.getElementById("map"), {
     zoom: 16,
-    center: {
-      lat: lat,
-      lng: lng
-    }
+    center: initial_location
   })
 
   let marker = new google.maps.Marker({
-    position: {
-      lat: lat,
-      lng: lng
-    },
+    position: initial_location,
     map: map,
     icon: new google.maps.MarkerImage(
-      "../data/outline_person_pin_circle_black_48dp.png",
+      "../data/person.png",
       new google.maps.Size(48, 48),
       new google.maps.Point(0, 0)
     )
@@ -106,8 +109,8 @@ function markerGenerate(map, lat, lng, directionsService, directionsRenderer) {
 };
 
 // 情報ウィンドウを生成する関数
-function infowindowGenerate(map, marker, lat, lng, directionsService, directionsRenderer) {
-  let ifContent =
+function infowindowGenerate(map, marker) {
+  let info_html =
   '<div id="pre_loc_div">'+
     '<button id="pre_loc" class="btn btn-primary">現在地から避難所まで行く</button>'+
   '</div>'
@@ -116,12 +119,12 @@ function infowindowGenerate(map, marker, lat, lng, directionsService, directions
       lat: lat,
       lng: lng
     },
-    content: ifContent
+    content: info_html
   });
 
   infowindow.open(map, marker);
 
-  MObsever(map, marker, infowindow, directionsService, directionsRenderer, lat, lng)
+  // MObsever(map, marker, infowindow, directionsService, directionsRenderer, lat, lng)
 }
 
 // MutationObserver
@@ -176,3 +179,6 @@ function calculateAndDisplayRoute(directionsService, directionsRenderer, lat, ln
     }
   );
 };
+
+async function setUpKaigoHackMap(initial_location, info_html, pin_img_path,pin_names,pin_locations){
+}
