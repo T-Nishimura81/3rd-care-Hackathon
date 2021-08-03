@@ -105,21 +105,17 @@ function markerGenerate(map, initial_location) {
 
   // googleMapのcenterを変更するとUIが消えるので再追加する
   addMapUI(map)
-
-  infowindowGenerate(map, marker, lat, lng, directionsService, directionsRenderer)
+  infowindowGenerate(map, marker, initial_location)
 };
 
 // 情報ウィンドウを生成する関数
-function infowindowGenerate(map, marker) {
+function infowindowGenerate(map, marker, initial_location) {
   let info_html =
   '<div id="pre_loc_div">'+
     '<button id="pre_loc" class="btn btn-primary">現在地から避難所まで行く</button>'+
   '</div>'
   let infowindow = new google.maps.InfoWindow({
-    position: {
-      lat: lat,
-      lng: lng
-    },
+    position: initial_location,
     content: info_html
   });
 
@@ -130,7 +126,7 @@ function infowindowGenerate(map, marker) {
 
 // MutationObserver
 // マップの生成を検知
-function MObsever(map, marker, infowindow, directionsService, directionsRenderer, lat, lng) {
+function MObsever(map, marker, infowindow, directionsService, directionsRenderer, initial_location) {
 
   let MTarget = document.querySelector("#map");
 
@@ -147,7 +143,7 @@ function MObsever(map, marker, infowindow, directionsService, directionsRenderer
       MTarget.addEventListener("click", () => {
         directionsRenderer.setMap(map);
         directionsRenderer.setPanel(document.querySelector("#route"));
-        calculateAndDisplayRoute(directionsService, directionsRenderer, lat, lng, marker, infowindow)
+        calculateAndDisplayRoute(directionsService, directionsRenderer, initial_location, marker, infowindow)
       }, false);
     }
   });
@@ -156,15 +152,12 @@ function MObsever(map, marker, infowindow, directionsService, directionsRenderer
 }
 
 // ルート案内する関数
-function calculateAndDisplayRoute(directionsService, directionsRenderer, lat, lng, marker, infowindow) {
+function calculateAndDisplayRoute(directionsService, directionsRenderer, initial_location, marker, infowindow) {
   infowindow.close();
   marker.setMap(null);
   directionsService.route(
     {
-      origin: {
-        lat: lat, // jsonデータを直接指定することができなかった
-        lng: lng　// jsonデータを直接指定することができなかった
-      },
+      origin: initial_location,
       destination: {
         lat: 35.495619,　// jsonデータを直接指定することができなかった
         lng: 139.670701　// jsonデータを直接指定することができなかった
