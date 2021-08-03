@@ -55,7 +55,7 @@ async function addMapUI(map, directionsService, directionsRenderer) {
 
   map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(UIbg);
 
-  UIbg.addEventListener("click", () => {
+  UIbg.addEventListener("click", async () => {
     let initial_location = await geolocation()
     // markerGenerate(map, initial_location)
   });
