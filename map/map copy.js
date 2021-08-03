@@ -54,27 +54,29 @@ async function addMapUI(map, directionsService, directionsRenderer) {
 
   map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(UIbg);
 
-  // UIbg.addEventListener("click", async () => {
-  //   let initial_location = await geolocation()
-  //   markerGenerate(map, initial_location)
-  // });
+  UIbg.addEventListener("click", async () => {
+    let initial_location = await geolocationCM()
+    markerGenerate(map, initial_location)
+  });
 }
 
 // 現在地の取得
-// 「変数名 = await geolocation()」をasync func 内で実行すると「initial_location[lat, lng]」が返ってくる 
-async function geolocation(){
+// 「変数名 = await geolocation()」をasync func 内で実行すると「[{lat: lat, lng: lng}」が返ってくる 
+async function geolocationCM(){
   let latlng = new Promise((resolve) => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         position => {
           let lat = position.coords.latitude;
           let lng = position.coords.longitude;
-          return resolve([lat, lng]);
+          return resolve({
+            lat: lat,
+            lng: lng
+          });
         }
       );
-    }  
+    }
   });
-
   let initial_location = await latlng;
   return initial_location;
 }
@@ -99,7 +101,7 @@ function markerGenerate(map, initial_location) {
   marker.setMap(map);
 
   // googleMapのcenterを変更する
-  map.setCenter(new google.maps.LatLng(lat, lng));
+  map.setCenter(new google.maps.LatLng(initial_location));
 
   // googleMapのcenterを変更するとUIが消えるので再追加する
   addMapUI(map)
@@ -179,5 +181,4 @@ function calculateAndDisplayRoute(directionsService, directionsRenderer, lat, ln
   );
 };
 
-async function setUpKaigoHackMap(initial_location, info_html, pin_img_path,pin_names,pin_locations){
-}
+function setUpKaigoHackMap(initial_location,pin_img_path,pop_design_html,pin_names,pin_locations){}

@@ -83,8 +83,8 @@ function geolocation(map, directionsService, directionsRenderer){
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(
       position => {
-        let lat = position.coords.latitude;
-        let lng = position.coords.longitude;
+        let lat = 35.450361;// position.coords.latitude;
+        let lng = 139.634228;// position.coords.longitude;
         markerGenerate(map, lat, lng, directionsService, directionsRenderer);
       }
     );
