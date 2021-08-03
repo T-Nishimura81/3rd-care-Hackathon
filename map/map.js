@@ -57,7 +57,7 @@ function addMapUI(map, directionsService, directionsRenderer) {
 
   UIbg.addEventListener("click", () => {
     geolocation(map, directionsService, directionsRenderer)
-    
+
   });
 }
 
@@ -160,7 +160,7 @@ function MObsever(map, marker, infowindow, directionsService, directionsRenderer
 
     if (MTarget) {
       observer.disconnect();
-      MTarget.addEventListener("click", () => {
+      MTarget.addEventListener("click", (directionsRenderer) => {
         directionsRenderer.setMap(map);
         directionsRenderer.setPanel(document.querySelector("#route"));
         calculateAndDisplayRoute(directionsService, directionsRenderer, lat, lng, marker, infowindow)
