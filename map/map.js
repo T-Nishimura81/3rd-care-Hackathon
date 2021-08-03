@@ -57,6 +57,7 @@ function addMapUI(map, directionsService, directionsRenderer) {
 
   UIbg.addEventListener("click", () => {
     geolocation(map, directionsService, directionsRenderer)
+    
   });
 }
 
