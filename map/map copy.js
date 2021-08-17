@@ -12,41 +12,11 @@
 ->direction api
 */
 
-async function initMap() {
-  // 初期マップの生成
-  const map = new google.maps.Map(document.getElementById("map"), {
-    zoom: 16,
-    center: {
-      lat: 35.495675,
-      lng: 139.67078
-    },
-  });
-
-  const classGeolocation = new UseGeolocation();
-
-  let initial_location = await classGeolocation.latlng();
-  let pin_img_path;
-  let pop_design_html;
-  let pin_names;
-  let pin_locations = ({
-    lat: 35.495675,
-    lng: 139.67078
-  });
-  
-  setUpKaigoHackMap(
-    initial_location,
-    pin_img_path,
-    pop_design_html,
-    pin_names,
-    pin_locations
-  )
-}
-
 // 現在地の取得
-// async function 内で実行すると「{lat: lat, lng: lng}が返ってくる 
 class UseGeolocation {
-  async latlng(){
-    let main = new Promise((resolve) => {
+  // async function 内で実行すると「{lat: lat, lng: lng}が返ってくる 
+  async getLatLng(){
+    const main = new Promise((resolve) => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           position => {
@@ -63,6 +33,14 @@ class UseGeolocation {
     });
 
     return main;
+  }
+
+  watch() {
+    navigator.geolocation.watchPosition(
+      position => {
+
+      }
+    )
   }
 }
 
@@ -127,9 +105,8 @@ class UseInfoWindow {
       infoWindow.open(map, marker);
       return resolve(infoWindow);  
     });
-
-    const exe = await main;
-    return exe;
+ 
+    return main;
   }
 
   close(infoWindow) {
@@ -150,45 +127,41 @@ class UseMutationObserver {
       };
   
       const observer = new MutationObserver(function() {
-          document.querySelector('"' + name + '"');
-          console.log(mutationTarget);
+          const node = document.querySelector('"' + name + '"');
           observer.disconnect()
-          return resolve(mutationTarget); 
+          return resolve(node);
         }
       );
   
       observer.observe(mutationTarget, mutatoinConf);
     });
+ 
+    return main;
+  }
 
-    const exe = await main;
-    return exe;
+  mutationMap(map) {
+    const main = new Promise(
+      resolve => {
+        const mutationTarget = document.querySelector('#map');
+
+        const mutatoinConf = {
+          childList: true,
+          subtree: true
+        };
+    
+        const observer = new MutationObserver(function() {
+            observer.disconnect()
+            addMapUI(map)
+          }
+        );
+    
+        observer.observe(mutationTarget, mutatoinConf);  
+      }
+    )
+
+    return main;
   }
 }
-
-// function MObsever(map, marker, infowindow, directionsService, directionsRenderer, initial_location) {
-
-//   let MTarget = document.querySelector("#map");
-
-//   const MConf = {
-//     childList: true,
-//     subtree: true
-//   };
-
-//   const observer = new MutationObserver(function (){
-//     MTarget = document.querySelector("#pre_loc");
-
-//     if (MTarget) {
-//       observer.disconnect();
-//       MTarget.addEventListener("click", () => {
-//         directionsRenderer.setMap(map);
-//         directionsRenderer.setPanel(document.querySelector("#route"));
-//         calculateAndDisplayRoute(directionsService, directionsRenderer, initial_location, marker, infowindow)
-//       }, false);
-//     }
-//   });
-  
-//   observer.observe(MTarget, MConf);
-// }
 
 // ルート案内する関数
 class UseDirection {
@@ -214,11 +187,11 @@ class UseDirection {
 // class AddMapUI {
 //   async set(map){
 //     const main = new Promise(resolve => {
-//       const UIbg = document.createElement('div');
+//       const mapUI = document.createElement('div');
 //       const UI = document.createElement('img');
     
-//       UIbg.style.paddingRight = "2.5%";
-//       UIbg.id = 'mapUI';
+//       mapUI.style.paddingRight = "2.5%";
+//       mapUI.id = 'mapUI';
 
 //       UI.src = "../data/location.png";
 //       UI.style.backgroundColor = "white";
@@ -226,11 +199,11 @@ class UseDirection {
 //       UI.height = 40;
 //       UI.style.cursor = "pointer";
 
-//       UIbg.appendChild(UI);
+//       mapUI.appendChild(UI);
     
-//       map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(UIbg);
+//       map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(mapUI);
 
-//       return resolve(UIbg);
+//       return resolve(mapUI);
 //     });
 
 //     const exe = await main;
@@ -256,12 +229,12 @@ class UseDirection {
 //   }
 // }
 
-function addMapUI() {
+async function addMapUI(map) {
   const UI = document.createElement('img');
   const mapUI = document.createElement('div');
 
-  UIbg.style.paddingRight = "2.5%";
-  UIbg.id = 'mapUI';
+  mapUI.style.paddingRight = "2.5%";
+  mapUI.id = 'mapUI';
 
   UI.src = "../data/location.png";
   UI.style.backgroundColor = "white";
@@ -273,20 +246,16 @@ function addMapUI() {
 
   map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(mapUI);
 
-  mapUI.addEventListener("click", async function() {
-    const AddMapUI_ = new AddMapUI();
+  mapUI.addEventListener("click", (async () => {
     const UseGeolocation_ = new UseGeolocation();
     const UseMarker_ = new UseMarker();
     const UseInfoWindow_ = new UseInfoWindow();
     const UseMutationObserver_ = new UseMutationObserver();
 
-    let initial_location = await UseGeolocation_.latlng();
+    let initial_location = await UseGeolocation_.getLatLng();
     let marker_ = UseMarker_.set(initial_location);
     let infoWindow_ = await UseInfoWindow_.open(marker_[0], marker_[1], initial_location);
-
-    await AddMapUI_.set(marker_[0]);
-    console.log(mapUI);
-  });
+  }));
 }
 
 function setUpKaigoHackMap(initial_location, pin_img_path,pop_design_html, pin_names, pin_locations) {
@@ -300,10 +269,71 @@ function setUpKaigoHackMap(initial_location, pin_img_path,pop_design_html, pin_n
     preserveViewport: false
   });
 
-  let marker = classMarker.set(initial_location, pin_img_path);
-  marker = classMarker.set(pin_locations, pin_img_path);
+  let marker = classMarker.set(pin_locations, pin_img_path);
   let infowindow = classInfoWindow.open(marker[0], marker[1], pin_locations, pop_design_html);
 
   directionsRenderer.setMap(marker[0]);
-  let direction = classDirection.route(directionsService, directionsRenderer, initial_location, pin_locations);
+  classDirection.route(directionsService, directionsRenderer, initial_location, pin_locations);
+
+  addMapUI(marker[0])
+}
+
+// ユーザの現在地を観測し、それをmap上に表示する関数
+function currentLocationTracking() {
+  const classMarker = new UseMarker();
+
+  navigator.geolocation.watchPosition((
+    position => {
+      const latlng = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      };
+
+      classMarker.set(latlng)
+    }),
+    (error => {
+      console.log(error.message);
+    }),
+    (() => {
+      const opt = {
+        'enableHighAccuracy': true,
+        'timeout': 100,
+        'maxinumAge': 100
+      };
+    })
+  )
+}
+
+// mapを生成するための非同期コールバック関数
+async function initMap() {
+  // 初期マップの生成
+  const map = new google.maps.Map(document.getElementById("map"), {
+    zoom: 16,
+    center: {
+      lat: 35.495675,
+      lng: 139.67078
+    }
+  });
+
+  const classGeolocation = new UseGeolocation();
+  const classMutationObserver = new UseMutationObserver();
+
+  currentLocationTracking()
+
+  let initial_location = await classGeolocation.getLatLng();
+  let pin_img_path;
+  let pop_design_html;
+  let pin_names;
+  let pin_locations = ({
+    lat: 35.495675,
+    lng: 139.67078
+  });
+  
+  setUpKaigoHackMap(
+    initial_location,
+    pin_img_path,
+    pop_design_html,
+    pin_names,
+    pin_locations
+  )
 }
