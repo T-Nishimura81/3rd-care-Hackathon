@@ -38,7 +38,7 @@ class UseGeolocation {
 
 // マーカーを生成する関数
 class UseMarker {
-  set(initial_location, pin_img_path){
+  deploingMarkerAndChangingMapCenter(initial_location, pin_img_path){
     if (
       pin_img_path == null ||
       pin_img_path == undefined ||
@@ -47,12 +47,13 @@ class UseMarker {
       pin_img_path = "../data/person.png";
     }
 
-    let map = new google.maps.Map(document.getElementById("map"), {
+    const map = new google.maps.Map(document.getElementById("map"), {
       zoom: 16,
-      center: initial_location
+      center: initial_location,
+      disableDefaultUI: true
     });
 
-    let marker = new google.maps.Marker({
+    const marker = new google.maps.Marker({
       position: initial_location,
       map: map,
       icon: new google.maps.MarkerImage(
@@ -62,16 +63,27 @@ class UseMarker {
       )
     });
 
-    marker.setMap(map);
-
     // googleMapのcenterを変更する
     map.setCenter(new google.maps.LatLng(initial_location));
 
     return [map, marker];
   }
 
-  // // googleMapのcenterを変更するとUIが消えるので再追加する
-  // addMapUI(map)
+  deploingMarker(map, coordinate, iconImagePath) {
+    let markers = [];
+
+    for (let length = Object.keys(coordinate).length; length > 0; index--) {
+      const marker = new google.maps.Marker({
+        map: map,
+        position: coordinate,
+        icon: iconImagePath
+      });
+
+      markers.push(marker);
+    }
+
+    return markers;
+  }
 };
 
 // 情報ウィンドウを生成する関数
@@ -230,7 +242,7 @@ function setUpKaigoHackMap(initial_location, pin_img_path,pop_design_html, pin_n
     preserveViewport: false
   });
 
-  let marker = classMarker.set(pin_locations, pin_img_path);
+  let marker = classMarker.deploingMarkerAndChangingMapCenter(pin_locations, pin_img_path);
   let infowindow = classInfoWindow.open(marker[0], marker[1], pin_locations, pop_design_html);
 
   directionsRenderer.setMap(marker[0]);
@@ -249,15 +261,14 @@ function currentLocationTracking() {
         lat: position.coords.latitude,
         lng: position.coords.longitude
       };
-
-      classMarker.set(latlng)
+      classMarker.deploingMarkerAndChangingMapCenter(latlng)
     }),
     (error => {
       console.log(error.message);
     }),
     (() => {
       const opt = {
-        'enableHighAccuracy': true,
+        'enableHighAccuracy': false,
         'timeout': 100,
         'maxinumAge': 100
       };
@@ -273,7 +284,8 @@ async function initMap() {
     center: {
       lat: 35.495675,
       lng: 139.67078
-    }
+    },
+    disableDefaultUI: true
   });
 
   const classGeolocation = new UseGeolocation();
