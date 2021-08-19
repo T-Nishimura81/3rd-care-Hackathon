@@ -38,7 +38,7 @@ class UseGeolocation {
 
 // マーカーを生成する関数
 class UseMarker {
-  deploingMarkerAndChangingMapCenter(initial_location, pin_img_path){
+  deploingMarkerAndAttention(initial_location, pin_img_path){
     if (
       pin_img_path == null ||
       pin_img_path == undefined ||
@@ -112,6 +112,8 @@ class UseInfoWindow {
  
     return main;
   }
+
+  allocation(markers, htmlToDisplay) {}
 
   close(infoWindow) {
     infoWindow.close();
