@@ -69,20 +69,20 @@ class UseMarker {
     return [map, marker];
   }
 
-  deploingMarker(map, coordinate, iconImagePath) {
-    let markers = [];
+  deploingMarker(map, coordinate, iconImgPath, marker) {
+    marker = new google.maps.Marker({
+      position: coordinate,
+      map: map,
+      icon: new google.maps.MarkerImage(
+        iconImgPath,
+        new google.maps.Size(48, 48),
+        new google.maps.Point(0, 0)
+      )
+    });
+  }
 
-    for (let length = Object.keys(coordinate).length; length > 0; index--) {
-      const marker = new google.maps.Marker({
-        map: map,
-        position: coordinate,
-        icon: iconImagePath
-      });
-
-      markers.push(marker);
-    }
-
-    return markers;
+  close(marker) {
+    marker.setMap(null);
   }
 };
 
@@ -113,7 +113,17 @@ class UseInfoWindow {
     return main;
   }
 
-  allocation(markers, htmlToDisplay) {}
+  allocation(map, markers, html) {
+    for(let i = 0; markers.length < i; i++) {
+      const infowindw = new google.maps.InfoWindow({
+        content: html
+      });
+
+      markers[i].addListener('click', () => {
+        infowindw.open(map, markers[i]);
+      });
+    }
+  }
 
   close(infoWindow) {
     infoWindow.close();
@@ -244,7 +254,7 @@ function setUpKaigoHackMap(initial_location, pin_img_path,pop_design_html, pin_n
     preserveViewport: false
   });
 
-  let marker = classMarker.deploingMarkerAndChangingMapCenter(pin_locations, pin_img_path);
+  let marker = classMarker.deploingMarkerAndAttention(pin_locations, pin_img_path);
   let infowindow = classInfoWindow.open(marker[0], marker[1], pin_locations, pop_design_html);
 
   directionsRenderer.setMap(marker[0]);
@@ -254,16 +264,19 @@ function setUpKaigoHackMap(initial_location, pin_img_path,pop_design_html, pin_n
 }
 
 // ユーザの現在地を観測し、それをmap上に表示する関数
-function currentLocationTracking() {
+function currentLocationTracking(map) {
   const classMarker = new UseMarker();
 
   navigator.geolocation.watchPosition((
     position => {
-      const latlng = {
+      const coordinate = {
         lat: position.coords.latitude,
         lng: position.coords.longitude
       };
-      classMarker.deploingMarkerAndChangingMapCenter(latlng)
+
+      const iconImgPath = "../data/person.png";
+
+      let marker = classMarker.deploingMarker(map, coordinate, iconImgPath);
     }),
     (error => {
       console.log(error.message);
@@ -282,12 +295,13 @@ function currentLocationTracking() {
 async function initMap() {
   // 初期マップの生成
   const map = new google.maps.Map(document.getElementById("map"), {
-    zoom: 16,
+    zoom: 10,
     center: {
-      lat: 35.495675,
-      lng: 139.67078
+      // 神奈川県の中心座標(目測)
+      lat: 35.4514441427883,
+      lng: 139.36231169109772
     },
-    disableDefaultUI: true
+    streetViewControl: false
   });
 
   const classGeolocation = new UseGeolocation();
@@ -304,13 +318,13 @@ async function initMap() {
     lng: 139.67078
   });
   
-  setUpKaigoHackMap(
-    initial_location,
-    pin_img_path,
-    pop_design_html,
-    pin_names,
-    pin_locations
-  )
+  // setUpKaigoHackMap(
+  //   initial_location,
+  //   pin_img_path,
+  //   pop_design_html,
+  //   pin_names,
+  //   pin_locations
+  // )
 
-  currentLocationTracking()
+  currentLocationTracking(map)
 }
