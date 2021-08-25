@@ -15,7 +15,7 @@
 // 現在地の取得
 class UseGeolocation {
   // async function 内で実行すると「{lat: lat, lng: lng}が返ってくる 
-  async getLatLng(){
+  async getLatLng() {
     const main = new Promise((resolve) => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -69,20 +69,13 @@ class UseMarker {
     return [map, marker];
   }
 
-  deploingMarker(map, coordinate, iconImagePath) {
-    let markers = [];
+  open(map, coordinate, iconImagePath) {
+    const marker = new google.maps.Marker({
+      position: coordinate,
+      icon: iconImagePath
+    });
 
-    for (let length = Object.keys(coordinate).length; length > 0; index--) {
-      const marker = new google.maps.Marker({
-        map: map,
-        position: coordinate,
-        icon: iconImagePath
-      });
-
-      markers.push(marker);
-    }
-
-    return markers;
+    return marker;
   }
 };
 
@@ -259,11 +252,14 @@ function currentLocationTracking() {
 
   navigator.geolocation.watchPosition((
     position => {
+      if(markerOpen) {
+        console.log("");
+      }
       const latlng = {
         lat: position.coords.latitude,
         lng: position.coords.longitude
       };
-      classMarker.deploingMarkerAndChangingMapCenter(latlng)
+      let markerOpen = classMarker.open(latlng);
     }),
     (error => {
       console.log(error.message);
