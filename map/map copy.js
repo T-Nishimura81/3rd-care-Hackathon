@@ -16,9 +16,6 @@
  * 現在地の取得に関するclass
  */
 class Geolocation {
-  /**
-   *
-   */
   async getCurrentLocation() {
     const main = new Promise((resolve) => {
       if (navigator.geolocation) {
@@ -40,7 +37,9 @@ class Geolocation {
   }
 }
 
-// マーカーを生成する関数
+/**
+ * markerに関するclass
+ */
 class Marker {
   deploingMarkerAndAttention(initial_location, pin_img_path){
     if (
@@ -73,19 +72,39 @@ class Marker {
     return [map, marker];
   }
 
-  open(map, coordinate, iconImgPath) {
-    for (let i = 0; i < coordinate.length; i++) {
-      const marker  = new google.maps.Marker({
-        map: map,
-        position: coordinate[i],
-        icon: iconImgPath
-      });
-    }
+  /**
+   * [{ lat: number, lng: number }]
+   * @param {object} map 
+   * @param {number[]} coordinate 
+   * @param {string} iconImgPath 
+   */
+  async open(map, coordinate, iconImgPath) {
+    const main = new Promise(
+      resolve => {
+        let markers = [];
+
+        for (let i = 0; i < coordinate.length; i++) {
+          const marker  = new google.maps.Marker({
+            map: map,
+            position: coordinate[i],
+            icon: iconImgPath
+          });
+
+          markers.push(marker);
+        }
+    
+        return resolve(markers);
+      }
+    )
+
+    return main;
   };
 }
 
-// 情報ウィンドウを生成する関数
-class Infowindow {
+/**
+ * infowindowに関するclass
+ */
+class InfoWindow {
   async open(map, marker, initial_location, pop_design_html) {
     const main = new Promise(resolve => {
       if (
@@ -111,15 +130,27 @@ class Infowindow {
     return main;
   }
 
-  allocation(markers, htmlToDisplay) {}
+  allocation(coordinate, htmlToDisplay, map, markers) {
+    for (let i = 0; i < markers.length; i++) {
+      const infowindow = new google.maps.InfoWindow({
+        position: coordinate,
+        content: htmlToDisplay[i]
+      });
+
+      markers[i].addListener("click", () => {
+        infowindow.open(map, markers[i]);
+      });
+    }
+  }
 
   close(infoWindow) {
     infoWindow.close();
   }
 }
 
-// MutationObserver
-// マップの生成を検知
+/**
+ * MutationObserverを利用するclass
+ */
 class MutationObserver {
   async return(name) {
     const main = new Promise(resolve => {
@@ -217,7 +248,7 @@ class Direction {
  * @param {string[]} pin_names 
  * @param {number[]} pin_locations 
  */
-function setUpKaigoHackMap(
+async function setUpKaigoHackMap(
   initial_location,
   pin_img_path,
   pop_design_html,
@@ -225,24 +256,12 @@ function setUpKaigoHackMap(
   pin_locations,
   map
 ) {
-  const classMarker = new Marker();
+  const class_Marker = new Marker();
+  const class_Infowindow = new InfoWindow();
 
-  const coordinate = [
-    {
-      lat: 35.4514441427883,
-      lng: 139.36231169109772
-    },
-    {
-      lat: 35.39824418905391,
-      lng: 139.49811992812673
-    }
-  ];
+  const markers = await class_Marker.open(map, pin_locations, pin_img_path);
 
-  const iconImgPath = "../data/person.png";
-
-  const markerOpen = classMarker.open(map, coordinate, iconImgPath);
-
-  console.log(markerOpen);
+  class_Infowindow.allocation(pin_locations, pop_design_html, map, markers);
 }
 
 /**
@@ -278,8 +297,8 @@ function currentLocationTracking(map) {
 }
 
 /**
- * mapの右側中央にカスタムUIを追加する
- * @param {*} map 
+ * mapの右側中央にカスタムUIを追加する関数
+ * @param {object} map 
  */
 async function addMapUI(map) {
   const UI = document.createElement('img');
@@ -298,7 +317,7 @@ async function addMapUI(map) {
 
   map.controls[google.maps.ControlPosition.RIGHT_CENTER].push(mapUI);
 
-  UI.addEventListener("click", () => {
+  mapUI.addEventListener("click", () => {
     currentLocationTracking(map);
   });
 }
@@ -321,10 +340,27 @@ async function initMap() {
   addMapUI(map)
 
   const initial_location = 0;
-  const pin_img_path = 0;
-  const pop_design_html = 0;
+
+  const pin_img_path = "../data/person.png";
+
+  const pop_design_html = [
+    '<div id="pre_loc_div"><button id="pre_loc" class="btn btn-primary">現在地から避難所まで行く</button></div>',
+    
+    '<div id="pre_loc_div"><button id="pre_loc" class="btn btn-primary">現在地から避難所まで行く</button></div>'
+  ];
+
   const pin_names = 0;
-  const pin_locations = 0;
+  
+  const pin_locations = [
+    {
+      lat: 35.4514441427883,
+      lng: 139.36231169109772
+    },
+    {
+      lat: 35.39824418905391,
+      lng: 139.49811992812673
+    }
+  ];
   
   setUpKaigoHackMap(
     initial_location,
