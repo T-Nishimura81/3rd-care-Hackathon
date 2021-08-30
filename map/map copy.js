@@ -184,7 +184,7 @@ class MutationObserver {
           subtree: true
         };
     
-        const observer = new MutationObserver(function() {
+        const observer = new MutationObserver(() => {
             observer.disconnect()
             addMapUI(map)
           }
@@ -266,12 +266,13 @@ async function setUpKaigoHackMap(
 
 /**
  * ユーザの現在地を追跡表示し続ける関数
+ * @param {object} map 
  */
 function currentLocationTracking(map) {
-  const classMarker = new Marker();
+  const class_Marker = new Marker();
 
   navigator.geolocation.watchPosition((
-    position => {
+    async position => {
       const coordinate = [
         {
           lat: position.coords.latitude,
@@ -281,7 +282,7 @@ function currentLocationTracking(map) {
 
       const iconImgPath = "../data/person.png";
 
-      const markerOpen = classMarker.open(map, coordinate, iconImgPath);
+      const markerOpen = await class_Marker.open(map, coordinate, iconImgPath);
     }),
     (error => {
       console.log(error.message);
@@ -322,6 +323,15 @@ async function addMapUI(map) {
   });
 }
 
+function directions(map) {
+  const class_Direction = new Direction();
+  
+  const directionsRenderer = new google.maps.DirectionsRenderer();
+  const directionsService = new google.maps.DirectionsService();
+
+  directionsRenderer.setMap(map);
+}
+
 /**
  * mapを生成するための非同期コールバック関数
  */
@@ -344,9 +354,9 @@ async function initMap() {
   const pin_img_path = "../data/person.png";
 
   const pop_design_html = [
-    '<div id="pre_loc_div"><button id="pre_loc" class="btn btn-primary">現在地から避難所まで行く</button></div>',
-    
-    '<div id="pre_loc_div"><button id="pre_loc" class="btn btn-primary">現在地から避難所まで行く</button></div>'
+    '<div id="pre_loc_div"><button id="pre_loc" class="btn btn-primary">in厚木市</button></div>',
+
+    '<div id="pre_loc_div"><button id="pre_loc" class="btn btn-primary">江ノ島線近い</button></div>'
   ];
 
   const pin_names = 0;
